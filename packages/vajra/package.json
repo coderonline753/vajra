@@ -1,0 +1,67 @@
+{
+  "name": "vajrajs",
+  "version": "0.7.5",
+  "description": "Indestructible. Lightning Fast. The batteries-included TypeScript backend framework.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "bun": "./src/index.ts",
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./ssr": {
+      "bun": "./src/ssr/index.ts",
+      "import": "./src/ssr/index.ts",
+      "types": "./src/ssr/index.ts"
+    },
+    "./jsx-runtime": {
+      "bun": "./src/ssr/jsx-runtime.ts",
+      "import": "./src/ssr/jsx-runtime.ts",
+      "types": "./src/ssr/jsx-runtime.ts"
+    },
+    "./jsx-dev-runtime": {
+      "bun": "./src/ssr/jsx-runtime.ts",
+      "import": "./src/ssr/jsx-runtime.ts",
+      "types": "./src/ssr/jsx-runtime.ts"
+    },
+    "./client": {
+      "bun": "./src/ssr/client.ts",
+      "import": "./src/ssr/client.ts",
+      "types": "./src/ssr/client.ts"
+    }
+  },
+  "files": ["src", "LICENSE", "README.md"],
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun",
+    "test": "bun test",
+    "bench": "bun run benchmarks/run.ts"
+  },
+  "keywords": ["framework", "bun", "typescript", "api", "fast", "ai", "microservices", "ssr", "islands", "jsx", "streaming"],
+  "license": "MIT",
+  "author": {
+    "name": "SaskSoftware",
+    "email": "coderonline.tech@gmail.com",
+    "url": "https://sasksoftware.in"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coderonline753/vajra"
+  },
+  "homepage": "https://vajra.run",
+  "bugs": {
+    "url": "https://github.com/coderonline753/vajra/issues",
+    "email": "coderonline.tech@gmail.com"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.8.0",
+    "zod": "^3.25.0"
+  },
+  "peerDependencies": {
+    "zod": ">=3.20.0"
+  }
+}
