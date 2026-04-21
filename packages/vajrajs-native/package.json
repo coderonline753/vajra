@@ -1,0 +1,36 @@
+{
+  "name": "@vajrajs/native",
+  "version": "0.1.0",
+  "description": "Optional native acceleration for Vajra — compiled Zod validators + fast JSON serialization. Pure-TS fallback always works.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "bun": "./src/index.ts",
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "files": ["src", "wasm", "LICENSE", "README.md"],
+  "scripts": {
+    "test": "bun test",
+    "build": "echo 'No build step — ships raw TS'"
+  },
+  "keywords": ["vajra", "native", "wasm", "performance", "zod"],
+  "license": "MIT",
+  "author": {
+    "name": "SaskSoftware",
+    "email": "coderonline.tech@gmail.com",
+    "url": "https://sasksoftware.in"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coderonline753/vajra",
+    "directory": "packages/vajrajs-native"
+  },
+  "peerDependencies": {
+    "vajrajs": ">=1.0.0",
+    "zod": ">=3.20.0"
+  }
+}

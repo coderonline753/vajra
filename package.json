@@ -1,0 +1,17 @@
+{
+  "name": "vajra-monorepo",
+  "private": true,
+  "description": "Monorepo root for the Vajra framework and its peer packages.",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "dev": "bun run --filter vajra dev",
+    "build": "bun run --filter '*' build",
+    "test": "bun run --filter '*' test",
+    "bench": "bun run --filter vajra bench"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coderonline753/vajra"
+  },
+  "license": "MIT"
+}

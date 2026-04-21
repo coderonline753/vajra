@@ -1,0 +1,19 @@
+{
+  "name": "create-vajra",
+  "version": "1.0.1",
+  "description": "Create a new Vajra project",
+  "type": "module",
+  "bin": {
+    "vajra": "./dist/cli.js",
+    "create-vajra": "./dist/cli.js"
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "dev": "bun run src/cli.ts",
+    "build": "bun build ./src/cli.ts --outdir ./dist --target bun",
+    "test": "bun test"
+  },
+  "keywords": ["vajra", "cli", "create", "scaffold"],
+  "license": "MIT",
+  "author": "Vajra Contributors"
+}
