@@ -46,6 +46,12 @@ bun add vajrajs
 
 Requires [Bun](https://bun.sh) v1.0+. TypeScript is built-in with Bun.
 
+All public APIs are exported from the main package. Always import from `'vajrajs'`, not from internal paths like `'vajrajs/src/...'`.
+
+```typescript
+import { Vajra, validate, cors, helmet, rateLimit, jwt, session } from 'vajrajs';
+```
+
 ## Quick Start
 
 ```typescript
