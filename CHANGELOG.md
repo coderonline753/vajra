@@ -3,6 +3,32 @@
 All notable changes to Vajra will be documented here.
 The format is based on Keep a Changelog · version scheme follows Semantic Versioning.
 
+## [1.2.1] on 2026-04-22
+
+Patch release. Two SSR/security fixes surfaced by the vajra-shop dogfood. No API breaks.
+
+### Fixed
+
+- **SSR `jsxDEV` 6-arg signature collision.** Bun's dev-mode JSX transform emits `jsxDEV(type, props, key, isStatic, src, self)`. The previous implementation aliased `jsxDEV = jsx` where `jsx` captured args 3+ as variadic children, so the trailing `key, isStatic, src, self` values were misinterpreted as children, then filtered out by `flattenChildren`. Real `props.children` was never read. Effect: any function component written with JSX children rendered empty under `tsconfig.compilerOptions.jsx: "react-jsx"` + `jsxImportSource: "vajrajs"`. The runtime now correctly separates the JSX automatic runtime (`jsx` / `jsxs` / `jsxDEV` — children always live in `props.children` per spec) from the classic runtime (`createElement` — children arrive as variadic rest args). Test suite gained `jsx-real-compile.test.ts`, which feeds real TSX to `Bun.Transpiler` and asserts nested children survive end-to-end.
+- **Helmet CSP default broke content sites.** `app.use(helmet())` defaulted to `default-src 'self'`, blocking external images, Google Fonts, and any CDN content out of the box. New users hitting this on their first content-site build saw blank cards in production-tier configs. Fixed via opt-in presets (see Added).
+
+### Added
+
+- **`helmet({ preset: 'web-app' | 'api' })`.** New preset option lets you pick a CSP baseline. `'api'` (default, unchanged behavior) keeps the strict `default-src 'self'`. `'web-app'` permits HTTPS images, Google Fonts (`fonts.googleapis.com` + `fonts.gstatic.com`), inline styles, and `data:` font URLs — while keeping `script-src 'self'` strict so XSS protection stays intact. Explicit `contentSecurityPolicy.directives` still completely overrides the preset.
+- **`create-vajra` full template now scaffolds `helmet({ preset: 'web-app' })`** so new projects with HTML pages render external assets without manual CSP work. The minimal template stays on the strict default with an inline comment showing how to switch.
+
+### Tests
+
+905 → **923**. New coverage: real Bun TSX compilation routed through vajra's runtime (5 tests covering host elements, function components with JSX children, multiple children ordering, nested components, fragments), separated automatic vs classic runtime contracts in `jsx-runtime.test.ts` (6 + 9 tests), and helmet preset behavior including override priority (6 tests).
+
+### Migration
+
+No code changes required. Existing apps continue working as-is.
+
+If you hit empty function components with JSX children on v1.2.0 and applied the classic-JSX workaround (`tsconfig.json` `{ "jsx": "react", "jsxFactory": "createElement" }` + per-file `import { createElement, Fragment } from 'vajrajs/ssr'`), you can now revert to the standard `{ "jsx": "react-jsx", "jsxImportSource": "vajrajs" }` config.
+
+If you are building a content site and hit broken images / fonts on v1.2.0 with `app.use(helmet())`, switch to `app.use(helmet({ preset: 'web-app' }))`.
+
 ## [1.2.0] on 2026-04-22
 
 Minor release. Adds an opt-in performance path and a peer acceleration package. No API breaks. All v1.0 and v1.0.1 code keeps working without changes.

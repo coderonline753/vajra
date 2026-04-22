@@ -103,3 +103,71 @@ describe('Helmet', () => {
     expect(res.headers.get('content-security-policy')).toBe("default-src 'none'");
   });
 });
+
+describe('Helmet · CSP presets', () => {
+  it('bare helmet() defaults to api preset (strict default-src self)', async () => {
+    const app = new Vajra();
+    app.use(helmet());
+    app.get('/', (c) => c.text('ok'));
+
+    const res = await app.handle(new Request('http://localhost/'));
+    expect(res.headers.get('content-security-policy')).toBe("default-src 'self'");
+  });
+
+  it('preset api is identical to bare helmet()', async () => {
+    const app = new Vajra();
+    app.use(helmet({ preset: 'api' }));
+    app.get('/', (c) => c.text('ok'));
+
+    const res = await app.handle(new Request('http://localhost/'));
+    expect(res.headers.get('content-security-policy')).toBe("default-src 'self'");
+  });
+
+  it('preset web-app permits HTTPS images, Google Fonts, inline styles', async () => {
+    const app = new Vajra();
+    app.use(helmet({ preset: 'web-app' }));
+    app.get('/', (c) => c.text('ok'));
+
+    const res = await app.handle(new Request('http://localhost/'));
+    const csp = res.headers.get('content-security-policy')!;
+    expect(csp).toContain("default-src 'self'");
+    expect(csp).toContain("img-src 'self' data: https:");
+    expect(csp).toContain("style-src 'self' 'unsafe-inline' https://fonts.googleapis.com");
+    expect(csp).toContain("font-src 'self' https://fonts.gstatic.com data:");
+    expect(csp).toContain("script-src 'self'");
+    expect(csp).toContain("connect-src 'self'");
+    expect(csp).toContain("object-src 'none'");
+  });
+
+  it('preset web-app keeps script-src strict (XSS protection intact)', async () => {
+    const app = new Vajra();
+    app.use(helmet({ preset: 'web-app' }));
+    app.get('/', (c) => c.text('ok'));
+
+    const res = await app.handle(new Request('http://localhost/'));
+    const csp = res.headers.get('content-security-policy')!;
+    // No 'unsafe-inline' or 'unsafe-eval' for script-src — that's the moat.
+    expect(csp).toMatch(/script-src 'self'(?!.*unsafe-)/);
+  });
+
+  it('explicit contentSecurityPolicy overrides preset', async () => {
+    const app = new Vajra();
+    app.use(helmet({
+      preset: 'web-app',
+      contentSecurityPolicy: { directives: { 'default-src': ["'none'"] } },
+    }));
+    app.get('/', (c) => c.text('ok'));
+
+    const res = await app.handle(new Request('http://localhost/'));
+    expect(res.headers.get('content-security-policy')).toBe("default-src 'none'");
+  });
+
+  it('preset web-app + contentSecurityPolicy: false disables CSP entirely', async () => {
+    const app = new Vajra();
+    app.use(helmet({ preset: 'web-app', contentSecurityPolicy: false }));
+    app.get('/', (c) => c.text('ok'));
+
+    const res = await app.handle(new Request('http://localhost/'));
+    expect(res.headers.has('content-security-policy')).toBe(false);
+  });
+});

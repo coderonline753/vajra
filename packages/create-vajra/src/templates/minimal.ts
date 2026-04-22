@@ -50,6 +50,9 @@ const app = new Vajra();
 
 // Middleware
 app.use(logger());
+// Default preset is 'api' (strict default-src self) — correct for JSON backends.
+// If you start serving HTML pages with images/fonts, switch to:
+//   app.use(helmet({ preset: 'web-app' }));
 app.use(helmet());
 
 // Routes

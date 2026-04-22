@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { jsx, Fragment, Suspense } from '../../src/ssr/jsx-runtime';
+import { createElement as jsx, Fragment, Suspense } from '../../src/ssr/jsx-runtime';
 import { renderToString, renderToStream } from '../../src/ssr/renderer';
 
 describe('renderToString', () => {

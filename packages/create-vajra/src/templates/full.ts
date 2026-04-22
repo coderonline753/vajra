@@ -60,7 +60,9 @@ const app = new Vajra({
 
 // Global middleware
 app.use(logger());
-app.use(helmet());
+// Use 'web-app' preset if you serve external images, fonts, or CDN assets.
+// Use 'api' (default) for pure JSON backends.
+app.use(helmet({ preset: 'web-app' }));
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 
 // Health checks

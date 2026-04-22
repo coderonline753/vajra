@@ -1,6 +1,6 @@
 {
   "name": "vajrajs",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Indestructible. Lightning Fast. The batteries-included TypeScript backend framework for Bun.",
   "type": "module",
   "main": "./src/index.ts",

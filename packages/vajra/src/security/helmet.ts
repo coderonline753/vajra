@@ -16,7 +16,28 @@ interface HstsOptions {
   preload?: boolean;
 }
 
+/**
+ * Built-in helmet presets.
+ *
+ * - `'api'` (default): strict `default-src 'self'`. Correct for backend APIs
+ *   that serve only same-origin JSON / no external assets.
+ * - `'web-app'`: relaxed CSP for content sites. Permits HTTPS images, Google
+ *   Fonts, and inline styles. Script execution stays restricted to same-origin.
+ *
+ * Pick a preset that matches what your app actually serves. New users
+ * building content sites with bare `helmet()` previously hit the strict
+ * default and saw broken images / fonts; `'web-app'` solves that without
+ * weakening XSS protection.
+ */
+export type HelmetPreset = 'api' | 'web-app';
+
 export interface HelmetOptions {
+  /**
+   * Pick a baseline. Defaults to `'api'`. Any explicit option below overrides
+   * the preset's value for that field. CSP directives replace, not merge —
+   * if you supply `contentSecurityPolicy.directives` you own the full set.
+   */
+  preset?: HelmetPreset;
   contentSecurityPolicy?: CspOptions | false;
   strictTransportSecurity?: HstsOptions | false;
   xContentTypeOptions?: boolean;
@@ -30,6 +51,27 @@ export interface HelmetOptions {
   xPermittedCrossDomainPolicies?: 'none' | 'master-only' | 'by-content-type' | 'all' | false;
   xDnsPrefetchControl?: boolean;
 }
+
+const PRESET_CSP: Record<HelmetPreset, CspOptions> = {
+  api: {
+    directives: {
+      'default-src': ["'self'"],
+    },
+  },
+  'web-app': {
+    directives: {
+      'default-src': ["'self'"],
+      'img-src': ["'self'", 'data:', 'https:'],
+      'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:'],
+      'script-src': ["'self'"],
+      'connect-src': ["'self'"],
+      'object-src': ["'none'"],
+      'base-uri': ["'self'"],
+      'frame-ancestors': ["'self'"],
+    },
+  },
+};
 
 function buildCsp(options: CspOptions): string {
   return Object.entries(options.directives)
@@ -57,12 +99,16 @@ function buildPermissionsPolicy(policy: Record<string, string[]>): string {
 export function helmet(options: HelmetOptions = {}): Middleware {
   // Pre-build all header values at construction time
   const headers: [string, string][] = [];
+  const preset = options.preset ?? 'api';
 
   // Content-Security-Policy
   const csp = options.contentSecurityPolicy;
   if (csp !== false) {
-    const cspValue = csp ? buildCsp(csp) : "default-src 'self'";
-    const headerName = csp?.reportOnly ? 'content-security-policy-report-only' : 'content-security-policy';
+    const effectiveCsp: CspOptions = csp ?? PRESET_CSP[preset];
+    const cspValue = buildCsp(effectiveCsp);
+    const headerName = effectiveCsp.reportOnly
+      ? 'content-security-policy-report-only'
+      : 'content-security-policy';
     headers.push([headerName, cspValue]);
   }
 

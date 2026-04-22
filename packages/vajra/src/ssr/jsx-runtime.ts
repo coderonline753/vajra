@@ -18,32 +18,54 @@ export interface VNode {
 /* Fragment symbol */
 export const Fragment = Symbol.for('vajra.fragment');
 
-/* JSX factory */
+/**
+ * JSX automatic runtime (react-jsx).
+ *
+ * Per the JSX automatic-runtime spec, children always live in `props.children`.
+ * Args after `props` are: `key` (jsx, jsxs), or `key, isStatic, src, self`
+ * (jsxDEV from Bun). They are NOT children. Aliasing all three to a single
+ * implementation that ignores extra args is correct.
+ *
+ * For hand-written manual calls that pass children positionally (legacy code,
+ * non-JSX scripts), use `createElement` instead — that's the classic-runtime
+ * contract and accepts variadic children.
+ */
 export function jsx(
   type: string | ComponentFn | typeof Fragment,
-  props: Props,
-  ...children: Child[]
+  props: Props | null,
+  _key?: unknown,
+  ..._devArgs: unknown[]
 ): VNode {
-  const flatChildren = flattenChildren(
-    children.length > 0 ? children : props.children != null ? [props.children] : []
-  );
-
-  const { children: _, ...restProps } = props;
-
-  return { type, props: restProps, children: flatChildren };
+  const safeProps = props ?? {};
+  const ch = safeProps.children;
+  const src: Child[] = ch == null ? [] : Array.isArray(ch) ? ch : [ch];
+  const { children: _ignored, ...restProps } = safeProps;
+  return { type, props: restProps, children: flattenChildren(src) };
 }
 
-/* Aliases for JSX automatic runtime */
 export const jsxs = jsx;
 export const jsxDEV = jsx;
 
-/* createElement alias (classic runtime) */
+/**
+ * createElement — classic JSX runtime (jsxFactory) and manual-call entry point.
+ *
+ * Children arrive as variadic rest args, matching React.createElement.
+ * Used when tsconfig sets `"jsx": "react", "jsxFactory": "createElement"`,
+ * and recommended for any code that constructs VNodes by hand.
+ */
 export function createElement(
   type: string | ComponentFn | typeof Fragment,
   props: Props | null,
   ...children: Child[]
 ): VNode {
-  return jsx(type, props || {}, ...children);
+  const safeProps = props ?? {};
+  const src: Child[] = children.length > 0
+    ? children
+    : safeProps.children != null
+      ? Array.isArray(safeProps.children) ? safeProps.children : [safeProps.children]
+      : [];
+  const { children: _ignored, ...restProps } = safeProps;
+  return { type, props: restProps, children: flattenChildren(src) };
 }
 
 /* Flatten nested children arrays, filter nulls */

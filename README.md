@@ -6,10 +6,10 @@ The batteries-included TypeScript backend framework built on Bun. 39 modules, on
 
 [![npm version](https://img.shields.io/npm/v/vajrajs.svg)](https://www.npmjs.com/package/vajrajs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-905%20passing-brightgreen)](https://vajra.run)
+[![Tests](https://img.shields.io/badge/tests-923%20passing-brightgreen)](https://vajra.run)
 [![Stable](https://img.shields.io/badge/status-stable-brightgreen)](https://vajra.run)
 
-> **v1.2.0 Stable.** 39 modules, 905 tests, 0 failures. Production tested on [vajra.run](https://vajra.run).
+> **v1.2.1 Stable.** 39 modules, 923 tests, 0 failures. Production tested on [vajra.run](https://vajra.run).
 
 ## Why Vajra?
 

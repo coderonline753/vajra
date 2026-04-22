@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'bun:test';
 import { Vajra } from '../../src/vajra';
-import { defineRoute, jsx, Fragment, island, atom, computed, renderHead } from '../../src/ssr';
+import { defineRoute, createElement as jsx, Fragment, island, atom, computed, renderHead } from '../../src/ssr';
 
 describe('SSR Integration with Vajra App', () => {
   test('app.page() registers SSR route', async () => {
